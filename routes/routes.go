@@ -5,10 +5,7 @@ import (
 )
 
 func RegisterRoutes(router *gin.Engine) {
-	api := router.Group("")
-	api.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "ping pong",
-		})
-	})
+	router.Static("/js", "ui")
+	router.StaticFile("/", "ui/index.html")
+	router.StaticFile("/profile", "ui/profile.html")
 }

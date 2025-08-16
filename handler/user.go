@@ -16,7 +16,7 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 }
 
 func (c *UserHandler) RegisterRoutes(r *gin.Engine) {
-	r.GET("/list", c.ListHandler)
+	//r.GET("/list", c.ListHandler)
 	r.POST("/signup", c.SignupHandler)
 	r.POST("/login", c.LoginHandler)
 
@@ -69,5 +69,8 @@ func (c *UserHandler) LoginHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
-	ctx.JSON(http.StatusOK, "Bearer "+token)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }
