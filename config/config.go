@@ -12,8 +12,9 @@ import (
 )
 
 type Config struct {
-	AppPort        string
-	UserCollection *mongo.Collection
+	AppPort           string
+	UserCollection    *mongo.Collection
+	ProductCollection *mongo.Collection
 }
 
 func Configurations() *Config {
@@ -26,6 +27,7 @@ func Configurations() *Config {
 	mongoURI := getEnv("MONGO_URI", "mongodb://localhost:27017")
 	dbName := getEnv("DATABASE_NAME", "staffy")
 	userColl := getEnv("USER_COLLECTION", "users")
+	productColl := getEnv("PRODUCT_COLLECTION", "products")
 	appPort := getEnv("APP_PORT", "8080")
 
 	client, err := db.ConnectMongo(mongoURI)
@@ -41,8 +43,9 @@ func Configurations() *Config {
 	fmt.Println("/***************************** Connected to MongoDB! *****************************/")
 
 	return &Config{
-		AppPort:        appPort,
-		UserCollection: client.Database(dbName).Collection(userColl),
+		AppPort:           appPort,
+		UserCollection:    client.Database(dbName).Collection(userColl),
+		ProductCollection: client.Database(dbName).Collection(productColl),
 	}
 }
 
