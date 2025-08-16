@@ -46,7 +46,9 @@ func (u *UserService) Login(ctx context.Context, request *model.LoginRequest) (s
 	if err != nil {
 		return "", nil, err
 	}
-	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
 		return "", nil, err
 	}
 
