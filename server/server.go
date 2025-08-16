@@ -13,7 +13,7 @@ func StartServer(conf *config.Config) {
 	r := gin.Default()
 	routes.RegisterRoutes(r) // default
 
-	userRepo := repo.NewUserRepo(conf.Ctx, conf.UserCollection)
+	userRepo := repo.NewUserRepo(conf.UserCollection)
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 

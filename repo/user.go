@@ -9,41 +9,40 @@ import (
 )
 
 type UserRepo struct {
-	ctx            context.Context
 	userCollection *mongo.Collection
 }
 
-func NewUserRepo(c context.Context, u *mongo.Collection) *UserRepo {
+func NewUserRepo(u *mongo.Collection) *UserRepo {
 	return &UserRepo{userCollection: u}
 }
 
-func (u *UserRepo) List() ([]*model.User, error) {
-	cursor, err := u.userCollection.Find(u.ctx, bson.D{})
+func (u *UserRepo) List(ctx context.Context) ([]*model.User, error) {
+	cursor, err := u.userCollection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(u.ctx)
+	defer cursor.Close(ctx)
 
 	var users []*model.User
-	if err := cursor.All(u.ctx, &users); err != nil {
+	if err := cursor.All(ctx, &users); err != nil {
 		return nil, err
 	}
 
 	return users, nil
 }
 
-func (u *UserRepo) Save(user *model.User) (*model.User, error) {
-	_, err := u.userCollection.InsertOne(u.ctx, user)
+func (u *UserRepo) Save(ctx context.Context, user *model.User) (*model.User, error) {
+	_, err := u.userCollection.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (u *UserRepo) GetByEmail(email string) (*model.User, error) {
+func (u *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user model.User
 
-	err := u.userCollection.FindOne(u.ctx, bson.M{"email": email}).Decode(&user)
+	err := u.userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil

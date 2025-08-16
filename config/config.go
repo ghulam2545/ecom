@@ -12,7 +12,6 @@ import (
 )
 
 type Config struct {
-	Ctx            context.Context
 	AppPort        string
 	UserCollection *mongo.Collection
 }
@@ -42,7 +41,6 @@ func Configurations() *Config {
 	fmt.Println("/***************************** Connected to MongoDB! *****************************/")
 
 	return &Config{
-		Ctx:            ctx,
 		AppPort:        appPort,
 		UserCollection: client.Database(dbName).Collection(userColl),
 	}

@@ -34,7 +34,7 @@ func (c *UserHandler) RegisterRoutes(r *gin.Engine) {
 }
 
 func (c *UserHandler) ListHandler(ctx *gin.Context) {
-	users, err := c.userService.List()
+	users, err := c.userService.List(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,7 +49,7 @@ func (c *UserHandler) SignupHandler(ctx *gin.Context) {
 		return
 	}
 
-	user, err := c.userService.Signup(&request)
+	user, err := c.userService.Signup(ctx, &request)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -64,7 +64,7 @@ func (c *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	token, _, err := c.userService.Login(&request)
+	token, _, err := c.userService.Login(ctx, &request)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return

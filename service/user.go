@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"ecom/model"
 	"ecom/repo"
 	"github.com/rs/xid"
@@ -16,11 +17,11 @@ func NewUserService(u *repo.UserRepo) *UserService {
 	return &UserService{userRepo: u}
 }
 
-func (u *UserService) List() ([]*model.User, error) {
-	return u.userRepo.List()
+func (u *UserService) List(ctx context.Context) ([]*model.User, error) {
+	return u.userRepo.List(ctx)
 }
 
-func (u *UserService) Signup(request *model.SignupRequest) (*model.User, error) {
+func (u *UserService) Signup(ctx context.Context, request *model.SignupRequest) (*model.User, error) {
 	email := request.Email
 	password := request.Password
 	role := request.Role
@@ -30,18 +31,18 @@ func (u *UserService) Signup(request *model.SignupRequest) (*model.User, error) 
 		return nil, err
 	}
 	user := model.User{UserId: xid.New().String(), Email: email, Password: string(h), Role: role, CreatedAt: time.Now()}
-	inserted, err := u.userRepo.Save(&user)
+	inserted, err := u.userRepo.Save(ctx, &user)
 	if err != nil {
 		return nil, err
 	}
 	return inserted, nil
 }
 
-func (u *UserService) Login(request *model.LoginRequest) (string, *model.User, error) {
+func (u *UserService) Login(ctx context.Context, request *model.LoginRequest) (string, *model.User, error) {
 	email := request.Email
 	password := request.Password
 
-	user, err := u.userRepo.GetByEmail(email)
+	user, err := u.userRepo.GetByEmail(ctx, email)
 	if err != nil {
 		return "", nil, err
 	}
