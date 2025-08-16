@@ -2,7 +2,7 @@ package server
 
 import (
 	"ecom/config"
-	"ecom/controller"
+	"ecom/handler"
 	"ecom/repo"
 	"ecom/routes"
 	"ecom/service"
@@ -15,8 +15,8 @@ func StartServer(conf *config.Config) {
 
 	userRepo := repo.NewUserRepo(conf.Ctx, conf.UserCollection)
 	userService := service.NewUserService(userRepo)
-	userController := controller.NewUserController(userService)
+	userHandler := handler.NewUserHandler(userService)
 
-	userController.RegisterRoutes(r)
+	userHandler.RegisterRoutes(r)
 	_ = r.Run(":" + conf.AppPort)
 }

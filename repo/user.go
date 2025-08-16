@@ -30,3 +30,11 @@ func (u *UserRepo) List() ([]*model.User, error) {
 
 	return users, nil
 }
+
+func (u *UserRepo) Save(user *model.User) (*model.User, error) {
+	_, err := u.userCollection.InsertOne(u.ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
