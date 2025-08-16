@@ -1,22 +1,51 @@
 package configuration
 
 import (
+	"context"
+	"ecom/db"
+	"fmt"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"log"
 	"os"
 )
 
 type Configuration struct {
-	AppPort string
+	Ctx            context.Context
+	AppPort        string
+	UserCollection *mongo.Collection
 }
 
 func Configurations() *Configuration {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("/************************* No .env file found")
+		log.Fatal("/***************************** No .env file found *****************************/")
 	}
 
-	return &Configuration{AppPort: getEnv("APP_PORT", "8080")}
+	ctx := context.Background()
+	mongoURI := getEnv("MONGO_URI", "mongodb://localhost:27017")
+	dbName := getEnv("DATABASE_NAME", "staffy")
+	userColl := getEnv("USER_COLLECTION", "users")
+	appPort := getEnv("APP_PORT", "8080")
+
+	client, err := db.ConnectMongo(mongoURI)
+	if err != nil {
+		log.Fatal("MongoDB connection error:", err)
+	}
+
+	// Ping the database
+	if err := client.Ping(ctx, readpref.Primary()); err != nil {
+		log.Fatal("MongoDB ping error:", err)
+	}
+
+	fmt.Println("/***************************** Connected to MongoDB! *****************************/")
+
+	return &Configuration{
+		Ctx:            ctx,
+		AppPort:        appPort,
+		UserCollection: client.Database(dbName).Collection(userColl),
+	}
 }
 
 func getEnv(key, defaultValue string) string {
