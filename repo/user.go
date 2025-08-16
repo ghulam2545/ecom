@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"ecom/model"
+	"errors"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -37,4 +38,18 @@ func (u *UserRepo) Save(user *model.User) (*model.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (u *UserRepo) GetByEmail(email string) (*model.User, error) {
+	var user model.User
+
+	err := u.userCollection.FindOne(u.ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &user, nil
 }

@@ -36,3 +36,19 @@ func (u *UserService) Signup(request *model.SignupRequest) (*model.User, error) 
 	}
 	return inserted, nil
 }
+
+func (u *UserService) Login(request *model.LoginRequest) (string, *model.User, error) {
+	email := request.Email
+	password := request.Password
+
+	user, err := u.userRepo.GetByEmail(email)
+	if err != nil {
+		return "", nil, err
+	}
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+		return "", nil, err
+	}
+
+	token, err := GenerateToken(user.UserId, user.Email, user.Role, 24*time.Hour)
+	return token, user, err
+}

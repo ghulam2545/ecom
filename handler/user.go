@@ -18,6 +18,19 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 func (c *UserHandler) RegisterRoutes(r *gin.Engine) {
 	r.GET("/list", c.ListHandler)
 	r.POST("/signup", c.SignupHandler)
+	r.POST("/login", c.LoginHandler)
+
+	api := r.Group("")
+	api.Use(service.JWTAuthMiddleware())
+	{
+		api.GET("/admin", service.RequireRoles("ADMIN"), func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "only admins can see this"})
+		})
+
+		api.GET("/user", service.RequireAnyRole("ADMIN", "USER"), func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "user or admin access"})
+		})
+	}
 }
 
 func (c *UserHandler) ListHandler(ctx *gin.Context) {
@@ -42,4 +55,19 @@ func (c *UserHandler) SignupHandler(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, user)
+}
+
+func (c *UserHandler) LoginHandler(ctx *gin.Context) {
+	var request model.LoginRequest
+	if err := ctx.ShouldBind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, _, err := c.userService.Login(&request)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+	ctx.JSON(http.StatusOK, "Bearer "+token)
 }
