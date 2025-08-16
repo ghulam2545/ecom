@@ -17,6 +17,11 @@ func StartServer(conf *config.Config) {
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
+	productRepo := repo.NewProductRepo(conf.ProductCollection)
+	productService := service.NewProductService(productRepo)
+	productHandler := handler.NewProductHandler(productService)
+
 	userHandler.RegisterRoutes(r)
+	productHandler.RegisterRoutes(r)
 	_ = r.Run(":" + conf.AppPort)
 }
