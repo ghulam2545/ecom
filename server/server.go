@@ -1,18 +1,22 @@
 package server
 
 import (
+	"ecom/config"
 	"ecom/controller"
+	"ecom/repo"
 	"ecom/routes"
-	"fmt"
+	"ecom/service"
 	"github.com/gin-gonic/gin"
 )
 
-func StartServer(port string, userController *controller.UserController) {
-	router := gin.Default()
-	routes.RegisterRoutes(router, userController)
+func StartServer(conf *config.Config) {
+	r := gin.Default()
+	routes.RegisterRoutes(r) // default
 
-	err := router.Run(fmt.Sprintf(":%s", port))
-	if err != nil {
-		panic(err)
-	}
+	userRepo := repo.NewUserRepo(conf.Ctx, conf.UserCollection)
+	userService := service.NewUserService(userRepo)
+	userController := controller.NewUserController(userService)
+
+	userController.RegisterRoutes(r)
+	_ = r.Run(":" + conf.AppPort)
 }

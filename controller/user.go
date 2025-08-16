@@ -14,6 +14,10 @@ func NewUserController(userService *service.UserService) *UserController {
 	return &UserController{userService: userService}
 }
 
+func (c *UserController) RegisterRoutes(r *gin.Engine) {
+	r.GET("/list", c.ListController)
+}
+
 func (c *UserController) ListController(ctx *gin.Context) {
 	users, err := c.userService.List()
 	if err != nil {

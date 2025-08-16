@@ -1,4 +1,4 @@
-package configuration
+package config
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	"os"
 )
 
-type Configuration struct {
+type Config struct {
 	Ctx            context.Context
 	AppPort        string
 	UserCollection *mongo.Collection
 }
 
-func Configurations() *Configuration {
+func Configurations() *Config {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("/***************************** No .env file found *****************************/")
@@ -41,7 +41,7 @@ func Configurations() *Configuration {
 
 	fmt.Println("/***************************** Connected to MongoDB! *****************************/")
 
-	return &Configuration{
+	return &Config{
 		Ctx:            ctx,
 		AppPort:        appPort,
 		UserCollection: client.Database(dbName).Collection(userColl),
