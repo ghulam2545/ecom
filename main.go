@@ -1,5 +1,13 @@
 package main
 
+import (
+	"ecom/configuration"
+	"ecom/server"
+)
+
 func main() {
-	print("Welcome to the Go Programming Language")
+	configurations := configuration.Configurations()
+	port := configurations.AppPort
+
+	server.StartServer(port)
 }
